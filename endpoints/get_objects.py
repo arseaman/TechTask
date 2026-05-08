@@ -8,7 +8,7 @@ class GetObject(Endpoint):
         self.response = requests.get(f"{URLS.BASE_USERS_URL}/{user_login}", headers=headers)
         self.response_json = self.response.json()
 
-    def check_users_fields(self, login, email):
+    def check_user_fields(self, login, email):
         assert self.response_json['login'] == login
         assert self.response_json["account_details"]['email'] == email
 

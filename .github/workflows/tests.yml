@@ -26,7 +26,7 @@ jobs:
 
       - name: Run pytest with Allure results
         run: |
-          pytest -v -s --alluredir=allure-results
+          pytest
         continue-on-error: true
 
       - name: Upload Allure raw results

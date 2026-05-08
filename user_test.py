@@ -1,4 +1,3 @@
-import pytest
 import payloads
 from endpoints.create_objects import CreateNewObjects
 from endpoints.get_objects import GetObject
@@ -7,41 +6,37 @@ import faker
 import allure
 import os
 from dotenv import load_dotenv
+import logging as logs
+
 
 load_dotenv()
 AUTHORIZATION_TOKEN = os.getenv("AUTHORIZATION_TOKEN")
 
-@allure.suite("Tests with Users")
-@allure.title("Test Create New User")
-@allure.description("This test attempts to create a new user with valid credentials and checks if the response is successful.")
+
 def test_create_new_user():
-    headers = {"Authorization": f'Token token="{AUTHORIZATION_TOKEN}"'}
-    payload = payloads.CREATE_USER_PAYLOAD
-    with allure.step("Creating a new user with valid credentials"):
-        create_user = CreateNewObjects()
-        create_user.create_new_user(payload, headers)
-    with allure.step("Checking if the response status code is 200"):
-        create_user.check_response_is_200()
-        data = create_user.response_json
-
-    return data
-
-
-@allure.suite("Tests with Users")
-@allure.title("Test Get User's Info")
-@allure.description("This test retrieves the information of a user created in the previous test and checks if the response contains the correct user details.")
-def test_get_user_info(new_user):
+    logs.info("Initialize methods")
     get_user = GetObject()
-    login = new_user["login"]
-    payload = payloads.CREATE_USER_PAYLOAD
+    create_user = CreateNewObjects()
+    payload = payloads.create_unique_user_payload()
+
+    logs.info("Creating a new user")
+    create_user.create_new_user(payload)
+
+    logs.info("Checking if the response status code is 200")
+    create_user.check_response_is_200()
+    data = create_user.response_json
+
+    logs.info("Initializing headers for GET request with Authorization and User-Token")
     headers_get = {
         "Authorization": f'Token token="{AUTHORIZATION_TOKEN}"',
-        "User-Token": new_user["User-Token"],
+        "User-Token": data["User-Token"],
     }
-    with allure.step("Retrieving the user's information using the login and checking if the response status code is 200"):
-        get_user.get_user_by_login(login, headers_get)
-        get_user.check_response_is_200()
-        get_user.check_users_fields(login, payload["user"]["email"])
+
+    logs.info("Retrieving the user's information using the login and checking user's fields and response status code is 200")
+    get_user.get_user_by_login(data["login"], headers_get)
+    get_user.check_response_is_200()
+    get_user.check_user_fields(payload["user"]["login"], payload["user"]["email"])
+
 
 
 @allure.suite("Tests with Users")
@@ -70,7 +65,7 @@ def test_update_user_info(new_user):
     with allure.step("Retrieving the updated user's information and checking if the response status code is 200 and the fields are updated correctly"):
         check_updated_field.get_user_by_login(new_name, headers)
         check_updated_field.check_response_is_200()
-        check_updated_field.check_users_fields(new_name, new_email)
+        check_updated_field.check_user_fields(new_name, new_email)
 
 
 
