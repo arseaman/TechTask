@@ -52,14 +52,14 @@ def test_update_user_info(new_user):
     }
     new_name = faker.Faker().user_name()
     new_email = faker.Faker().email()
-    UPDATE_USER_PAYLOAD = {
+    UPDATED_USER_PAYLOAD = {
           "user": {
             "login": new_name,
             "email": new_email
           }
         }
     with allure.step("Updating the user's information with new login and email, and checking if the response status code is 200 with successful update message"):
-        update_user.update_user(login, payload=UPDATE_USER_PAYLOAD, headers=headers)
+        update_user.update_user(login, payload=UPDATED_USER_PAYLOAD, headers=headers)
         update_user.check_response_is_200()
         update_user.check_successful_update_message()
     with allure.step("Retrieving the updated user's information and checking if the response status code is 200 and the fields are updated correctly"):
